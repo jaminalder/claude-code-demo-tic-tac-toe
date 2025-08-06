@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/ext/sse.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .players-display {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .players-display p {
+            margin: 0;
+            font-size: 18px;
+            color: #495057;
+        }
+        
+        .players-display strong {
+            color: #212529;
+        }
+        
+        .turn-indicator {
+            background-color: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 18px;
+            color: #1565c0;
+            font-weight: bold;
+        }
+        
+        .game-result {
+            background-color: #f3e5f5;
+            border: 2px solid #9c27b0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 24px;
+            color: #7b1fa2;
+            font-weight: bold;
+        }
+        
+        .game-result.winner {
+            background-color: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        
+        .game-result.draw {
+            background-color: #fff3e0;
+            border-color: #ff9800;
+            color: #ef6c00;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1><a href="/">Tic-Tac-Toe</a></h1>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="hero">
+            <h2>Game #{{.GameID}}</h2>
+            
+            {{if .PlayerEmojis}}
+            <div class="players-display">
+                <p><strong>Players:</strong> 
+                {{range $i, $emoji := .PlayerEmojis}}{{if $i}} vs {{end}}{{$emoji}}{{end}}
+                </p>
+            </div>
+            {{end}}
+            
+            <!-- Turn Indicator -->
+            <div id="game-status">
+                {{if .IsGameActive}}
+                <div class="turn-indicator">
+                    {{if .CurrentTurnEmoji}}
+                        {{if .IsPlayersTurn}}
+                            <span>🎯 Your turn! ({{.CurrentTurnEmoji}})</span>
+                        {{else}}
+                            <span>{{.CurrentTurnEmoji}}'s turn</span>
+                        {{end}}
+                    {{end}}
+                </div>
+                {{end}}
+                
+                <!-- Game Result -->
+                {{if .IsGameFinished}}
+                    {{if .WinnerEmoji}}
+                    <div class="game-result winner">
+                        🏆 {{.WinnerEmoji}} wins!
+                    </div>
+                    {{else if eq .GameStatus "draw"}}
+                    <div class="game-result draw">
+                        🤝 It's a draw!
+                    </div>
+                    {{end}}
+                {{end}}
+            </div>
+            
+            {{if .IsGameActive}}
+            <p>Click on any empty cell to place your emoji!</p>
+            {{else if .IsGameFinished}}
+            <p>Game finished! Start a new game to play again.</p>
+            {{end}}
+            
+            <div class="game-section">                
+                <div id="game-board" class="game-board">
+                    <div class="game-row">
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/0/0" hx-target="#game-board" hx-swap="outerHTML"></div>
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/0/1" hx-target="#game-board" hx-swap="outerHTML"></div>
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/0/2" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    </div>
+                    <div class="game-row">
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/1/0" hx-target="#game-board" hx-swap="outerHTML"></div>
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/1/1" hx-target="#game-board" hx-swap="outerHTML"></div>
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/1/2" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    </div>
+                    <div class="game-row">
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/2/0" hx-target="#game-board" hx-swap="outerHTML"></div>
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/2/1" hx-target="#game-board" hx-swap="outerHTML"></div>
+                        <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/2/2" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    </div>
+                </div>
+                
+                <!-- SSE Connection for Real-time Updates -->
+                <div hx-ext="sse" sse-connect="/api/game/{{.GameID}}/events" style="display: none;">
+                    <div sse-swap="move" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    <div sse-swap="reset" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    <div sse-swap="initial" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    <div sse-swap="game_winner" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    <div sse-swap="game_draw" hx-target="#game-board" hx-swap="outerHTML"></div>
+                    <div sse-swap="game_status" hx-target="#game-status" hx-swap="outerHTML"></div>
+                </div>
+                
+                <div class="game-controls">
+                    <button hx-post="/api/game/{{.GameID}}/reset" hx-target="#game-board" hx-swap="outerHTML" class="btn btn-secondary">Reset Game</button>
+                    <a href="/" class="btn btn-primary">New Game</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-Requested-With'] = 'XMLHttpRequest';
+        });
+        
+        // Handle game events for UI updates (no page reload needed since UI updates will come via SSE)
+    </script>
+</body>
+</html>

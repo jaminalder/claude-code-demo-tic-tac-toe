@@ -1,0 +1,16 @@
+{{define "tictactoe"}}
+<div id="game-board" class="game-board">
+    {{range $row := .Board}}
+    <div class="game-row">
+        {{range $col, $cell := $row}}
+        <div class="game-cell" 
+             hx-post="/api/game/move/{{$row}}/{{$col}}" 
+             hx-target="#game-board"
+             hx-swap="outerHTML">
+            {{if $cell}}{{$cell}}{{end}}
+        </div>
+        {{end}}
+    </div>
+    {{end}}
+</div>
+{{end}}

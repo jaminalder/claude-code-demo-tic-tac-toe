@@ -1,0 +1,17 @@
+{{define "counter"}}
+<div id="counter" class="counter">
+    <span class="count">{{.Count}}</span>
+    <div class="counter-buttons">
+        <button 
+            hx-post="/api/counter/increment" 
+            hx-target="#counter"
+            hx-swap="outerHTML"
+            class="btn btn-secondary">+</button>
+        <button 
+            hx-post="/api/counter/decrement" 
+            hx-target="#counter"
+            hx-swap="outerHTML"
+            class="btn btn-secondary">-</button>
+    </div>
+</div>
+{{end}}

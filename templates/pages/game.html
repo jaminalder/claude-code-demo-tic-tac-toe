@@ -1,0 +1,37 @@
+{{define "content"}}
+<div class="hero">
+    <h2>Game #{{.GameID}}</h2>
+    <p>Click on any empty cell to place an X. Share this URL to let others join!</p>
+    
+    <div class="game-section">
+        <div class="game-url">
+            <p><strong>Share this game:</strong></p>
+            <input type="text" class="url-input" value="{{.GameURL}}" readonly onclick="this.select()">
+            <button onclick="navigator.clipboard.writeText('{{.GameURL}}')" class="btn btn-secondary btn-small">Copy Link</button>
+        </div>
+        
+        <div id="game-board" class="game-board">
+            <div class="game-row">
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/0/0" hx-target="#game-board" hx-swap="outerHTML"></div>
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/0/1" hx-target="#game-board" hx-swap="outerHTML"></div>
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/0/2" hx-target="#game-board" hx-swap="outerHTML"></div>
+            </div>
+            <div class="game-row">
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/1/0" hx-target="#game-board" hx-swap="outerHTML"></div>
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/1/1" hx-target="#game-board" hx-swap="outerHTML"></div>
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/1/2" hx-target="#game-board" hx-swap="outerHTML"></div>
+            </div>
+            <div class="game-row">
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/2/0" hx-target="#game-board" hx-swap="outerHTML"></div>
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/2/1" hx-target="#game-board" hx-swap="outerHTML"></div>
+                <div class="game-cell" hx-post="/api/game/{{.GameID}}/move/2/2" hx-target="#game-board" hx-swap="outerHTML"></div>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <button hx-post="/api/game/{{.GameID}}/reset" hx-target="#game-board" hx-swap="outerHTML" class="btn btn-secondary">Reset Game</button>
+            <a href="/" class="btn btn-primary">New Game</a>
+        </div>
+    </div>
+</div>
+{{end}}

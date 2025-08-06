@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1><a href="/">Tic-Tac-Toe</a></h1>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="hero">
+            <h2>Game Not Found</h2>
+            <p>The game you're looking for doesn't exist or has expired.</p>
+            
+            <div class="game-section">
+                <div class="game-controls">
+                    <a href="/" class="btn btn-primary">Start New Game</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-Requested-With'] = 'XMLHttpRequest';
+        });
+    </script>
+</body>
+</html>
