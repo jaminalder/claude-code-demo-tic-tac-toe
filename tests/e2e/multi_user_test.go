@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"fmt"
+	"html/template"
 	"net/http/httptest"
 	"regexp"
 	"testing"
@@ -10,16 +11,37 @@ import (
 	"htmx-go-app/handlers"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/multitemplate"
 	"github.com/playwright-community/playwright-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func createTestRender() multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+	
+	// Define function map
+	funcMap := template.FuncMap{
+		"isHXRequest": func(c *gin.Context) bool {
+			return c.GetHeader("HX-Request") == "true"
+		},
+	}
+	
+	// Add templates with base template inheritance using test paths
+	r.AddFromFilesFuncs("home.html", funcMap, "../../templates/layouts/base.html", "../../templates/pages/home.html")
+	r.AddFromFilesFuncs("game.html", funcMap, "../../templates/layouts/base.html", "../../templates/pages/game.html")
+	r.AddFromFilesFuncs("emoji-selection.html", funcMap, "../../templates/layouts/base.html", "../../templates/pages/emoji-selection.html")
+	r.AddFromFilesFuncs("game-full.html", funcMap, "../../templates/layouts/base.html", "../../templates/pages/game-full.html")
+	r.AddFromFilesFuncs("404.html", funcMap, "../../templates/layouts/base.html", "../../templates/pages/404.html")
+	
+	return r
+}
+
 func setupRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 
-	r.LoadHTMLGlob("../../templates/**/*")
+	r.HTMLRender = createTestRender()
 	r.Static("/static", "../../static")
 
 	// Main pages
