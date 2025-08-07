@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    {{if .NeedsSSE}}<script src="https://unpkg.com/htmx.org@1.9.10/dist/ext/sse.js"></script>{{end}}
     <link rel="stylesheet" href="/static/css/style.css">
+    {{if eq .PageType "game"}}{{template "game_styles" .}}{{end}}
+    {{if eq .PageType "emoji"}}{{template "emoji_styles" .}}{{end}}
 </head>
 <body>
     <nav class="navbar">
@@ -15,7 +18,11 @@
     </nav>
 
     <main class="main-content">
-        {{template "content" .}}
+        {{if eq .PageType "home"}}{{template "home_content" .}}{{end}}
+        {{if eq .PageType "game"}}{{template "game_content" .}}{{end}}
+        {{if eq .PageType "emoji"}}{{template "emoji_content" .}}{{end}}
+        {{if eq .PageType "notfound"}}{{template "notfound_content" .}}{{end}}
+        {{if eq .PageType "gamefull"}}{{template "gamefull_content" .}}{{end}}
     </main>
 
     <script>
@@ -23,5 +30,7 @@
             event.detail.headers['X-Requested-With'] = 'XMLHttpRequest';
         });
     </script>
+    {{if eq .PageType "game"}}{{template "game_scripts" .}}{{end}}
+    {{if eq .PageType "emoji"}}{{template "emoji_scripts" .}}{{end}}
 </body>
 </html>

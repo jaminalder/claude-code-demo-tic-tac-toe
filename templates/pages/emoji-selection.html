@@ -1,0 +1,161 @@
+{{define "emoji_content"}}
+<div class="hero">
+    <h2>{{.Title}}</h2>
+    
+    {{if .IsWaitingState}}
+        <!-- Player 1 waiting for opponent -->
+        <div class="waiting-state">
+            <div class="waiting-message">
+                <p>You selected {{.SelectedEmoji}}!</p>
+                <p>Waiting for opponent to join...</p>
+            </div>
+            
+            <div class="game-sharing">
+                <p><strong>Share this game:</strong></p>
+                <input type="text" class="url-input" value="{{.GameURL}}" readonly onclick="this.select()">
+                <button onclick="navigator.clipboard.writeText('{{.GameURL}}')" class="btn btn-secondary btn-small">Copy Link</button>
+            </div>
+            
+            <!-- SSE Connection for game ready event -->
+            <div hx-ext="sse" sse-connect="/api/game/{{.GameID}}/events" style="display: none;">
+                <div sse-swap="game_ready"></div>
+            </div>
+        </div>
+    {{else}}
+        <!-- Player selection state -->
+        <div class="instructions">
+            {{if .IsFirstPlayer}}
+                <p>Choose your emoji to represent you in the game!</p>
+            {{else}}
+                <p>Choose your emoji to represent you in the game!</p>
+                <p>Grayed out emojis are already taken by other players.</p>
+            {{end}}
+        </div>
+        
+        <form method="POST" action="/game/{{.GameID}}/select-emoji" class="selection-form">
+            <div class="emoji-grid">
+                {{range .AvailableEmojis}}
+                    {{if .available}}
+                        <button type="submit" name="emoji" value="{{.emoji}}" class="emoji-option">
+                            {{.emoji}}
+                        </button>
+                    {{else}}
+                        <button type="button" class="emoji-option" disabled>
+                            {{.emoji}}
+                        </button>
+                    {{end}}
+                {{end}}
+            </div>
+        </form>
+    {{end}}
+</div>
+{{end}}
+
+{{define "emoji_styles"}}
+<style>
+    .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .emoji-option {
+        font-size: 48px;
+        border: 3px solid #ddd;
+        border-radius: 12px;
+        background: white;
+        cursor: pointer;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.2s ease;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .emoji-option:hover:not(:disabled) {
+        border-color: #007bff;
+        background-color: #f8f9fa;
+        transform: scale(1.05);
+    }
+    
+    .emoji-option:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        border-color: #ccc;
+    }
+    
+    .selection-form {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .instructions {
+        margin-bottom: 30px;
+        font-size: 18px;
+        color: #666;
+    }
+    
+    .waiting-state {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .waiting-message {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #f0f8ff;
+        border: 2px solid #b3d9ff;
+        border-radius: 12px;
+    }
+    
+    .waiting-message p:first-child {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .waiting-message p:last-child {
+        font-size: 18px;
+        color: #666;
+    }
+    
+    .game-sharing {
+        background-color: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .game-sharing p {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    
+    .url-input {
+        width: 300px;
+        padding: 10px;
+        margin-right: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: monospace;
+    }
+</style>
+{{end}}
+
+{{define "emoji_scripts"}}
+<script>
+    // Handle game ready event for redirect
+    document.addEventListener('htmx:sse-message', function(event) {
+        if (event.detail.type === 'game_ready') {
+            // Redirect to game page
+            window.location.href = '/game/{{.GameID}}';
+        }
+    });
+</script>
+{{end}}

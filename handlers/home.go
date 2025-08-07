@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var counter int = 0
 
 type GameBoard [3][3]string
 
@@ -263,9 +262,11 @@ func addPlayerToGame(game *Game, playerID, emoji string) error {
 func HomeHandler(c *gin.Context) {
 	data := gin.H{
 		"Title": "Tic-Tac-Toe Game",
+		"NeedsSSE": false,
+		"PageType": "home",
 	}
 
-	c.HTML(http.StatusOK, "home.html", data)
+	c.HTML(http.StatusOK, "base.html", data)
 }
 
 func NewGameHandler(c *gin.Context) {
@@ -278,8 +279,10 @@ func GamePageHandler(c *gin.Context) {
 	game := getGame(gameID)
 
 	if game == nil {
-		c.HTML(http.StatusNotFound, "404.html", gin.H{
+		c.HTML(http.StatusNotFound, "base.html", gin.H{
 			"Title": "Game Not Found",
+			"NeedsSSE": false,
+			"PageType": "notfound",
 		})
 		return
 	}
@@ -337,9 +340,11 @@ func GamePageHandler(c *gin.Context) {
 		"WinnerEmoji":      winnerEmoji,
 		"IsGameActive":     isGameActive(game),
 		"IsGameFinished":   isGameFinished(game),
+		"NeedsSSE":         true,
+		"PageType":         "game",
 	}
 
-	c.HTML(http.StatusOK, "game.html", data)
+	c.HTML(http.StatusOK, "base.html", data)
 }
 
 func EmojiSelectionHandler(c *gin.Context) {
@@ -347,8 +352,10 @@ func EmojiSelectionHandler(c *gin.Context) {
 	game := getGame(gameID)
 
 	if game == nil {
-		c.HTML(http.StatusNotFound, "404.html", gin.H{
+		c.HTML(http.StatusNotFound, "base.html", gin.H{
 			"Title": "Game Not Found",
+			"NeedsSSE": false,
+			"PageType": "notfound",
 		})
 		return
 	}
@@ -359,8 +366,10 @@ func EmojiSelectionHandler(c *gin.Context) {
 	if !canJoinGame(game) {
 		// Check if this player is already in the game
 		if _, exists := game.Players[playerID]; !exists {
-			c.HTML(http.StatusOK, "game-full.html", gin.H{
+			c.HTML(http.StatusOK, "base.html", gin.H{
 				"Title": "Game Full",
+				"NeedsSSE": false,
+				"PageType": "gamefull",
 			})
 			return
 		}
@@ -385,8 +394,10 @@ func EmojiSelectionHandler(c *gin.Context) {
 				"SelectedEmoji":  player.Emoji,
 				"IsWaitingState": true,
 				"IsFirstPlayer":  true,
+				"NeedsSSE":       true,
+				"PageType":       "emoji",
 			}
-			c.HTML(http.StatusOK, "emoji-selection.html", data)
+			c.HTML(http.StatusOK, "base.html", data)
 			return
 		}
 
@@ -416,9 +427,11 @@ func EmojiSelectionHandler(c *gin.Context) {
 		"AvailableEmojis": availableEmojiList,
 		"IsWaitingState":  false,
 		"IsFirstPlayer":   wouldBeFirst,
+		"NeedsSSE":        true,
+		"PageType":        "emoji",
 	}
 
-	c.HTML(http.StatusOK, "emoji-selection.html", data)
+	c.HTML(http.StatusOK, "base.html", data)
 }
 
 func EmojiSelectionSubmitHandler(c *gin.Context) {
@@ -478,62 +491,6 @@ func EmojiSelectionSubmitHandler(c *gin.Context) {
 	}
 }
 
-func GreetingHandler(c *gin.Context) {
-	greetings := []string{
-		"Hello from the server!",
-		"HTMX is working perfectly!",
-		"Server-side rendering rocks!",
-		"Go and HTMX make a great team!",
-	}
-
-	greeting := greetings[time.Now().Second()%len(greetings)]
-	response := fmt.Sprintf(`<p class="greeting">%s <em>(Generated at %s)</em></p>`,
-		greeting, time.Now().Format("15:04:05"))
-
-	c.Header("Content-Type", "text/html")
-	c.String(http.StatusOK, response)
-}
-
-func CounterIncrementHandler(c *gin.Context) {
-	if c.GetHeader("HX-Request") != "true" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "HTMX request required"})
-		return
-	}
-
-	counter++
-	renderCounter(c, counter)
-}
-
-func CounterDecrementHandler(c *gin.Context) {
-	if c.GetHeader("HX-Request") != "true" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "HTMX request required"})
-		return
-	}
-
-	counter--
-	renderCounter(c, counter)
-}
-
-func renderCounter(c *gin.Context, count int) {
-	response := fmt.Sprintf(`<div id="counter" class="counter">
-		<span class="count">%s</span>
-		<div class="counter-buttons">
-			<button 
-				hx-post="/api/counter/increment" 
-				hx-target="#counter"
-				hx-swap="outerHTML"
-				class="btn btn-secondary">+</button>
-			<button 
-				hx-post="/api/counter/decrement" 
-				hx-target="#counter"
-				hx-swap="outerHTML"
-				class="btn btn-secondary">-</button>
-		</div>
-	</div>`, strconv.Itoa(count))
-
-	c.Header("Content-Type", "text/html")
-	c.String(http.StatusOK, response)
-}
 
 func GameMoveHandler(c *gin.Context) {
 	if c.GetHeader("HX-Request") != "true" {
