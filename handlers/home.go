@@ -263,10 +263,9 @@ func HomeHandler(c *gin.Context) {
 	data := gin.H{
 		"Title": "Tic-Tac-Toe Game",
 		"NeedsSSE": false,
-		"PageType": "home",
 	}
 
-	c.HTML(http.StatusOK, "base.html", data)
+	c.HTML(http.StatusOK, "home.html", data)
 }
 
 func NewGameHandler(c *gin.Context) {
@@ -279,11 +278,10 @@ func GamePageHandler(c *gin.Context) {
 	game := getGame(gameID)
 
 	if game == nil {
-		c.HTML(http.StatusNotFound, "base.html", gin.H{
+		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"Title": "Game Not Found",
 			"NeedsSSE": false,
-			"PageType": "notfound",
-		})
+			})
 		return
 	}
 
@@ -341,10 +339,9 @@ func GamePageHandler(c *gin.Context) {
 		"IsGameActive":     isGameActive(game),
 		"IsGameFinished":   isGameFinished(game),
 		"NeedsSSE":         true,
-		"PageType":         "game",
 	}
 
-	c.HTML(http.StatusOK, "base.html", data)
+	c.HTML(http.StatusOK, "game.html", data)
 }
 
 func EmojiSelectionHandler(c *gin.Context) {
@@ -352,11 +349,10 @@ func EmojiSelectionHandler(c *gin.Context) {
 	game := getGame(gameID)
 
 	if game == nil {
-		c.HTML(http.StatusNotFound, "base.html", gin.H{
+		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"Title": "Game Not Found",
 			"NeedsSSE": false,
-			"PageType": "notfound",
-		})
+			})
 		return
 	}
 
@@ -366,11 +362,10 @@ func EmojiSelectionHandler(c *gin.Context) {
 	if !canJoinGame(game) {
 		// Check if this player is already in the game
 		if _, exists := game.Players[playerID]; !exists {
-			c.HTML(http.StatusOK, "base.html", gin.H{
+			c.HTML(http.StatusOK, "game-full.html", gin.H{
 				"Title": "Game Full",
 				"NeedsSSE": false,
-				"PageType": "gamefull",
-			})
+					})
 			return
 		}
 	}
@@ -395,9 +390,8 @@ func EmojiSelectionHandler(c *gin.Context) {
 				"IsWaitingState": true,
 				"IsFirstPlayer":  true,
 				"NeedsSSE":       true,
-				"PageType":       "emoji",
-			}
-			c.HTML(http.StatusOK, "base.html", data)
+					}
+			c.HTML(http.StatusOK, "emoji-selection.html", data)
 			return
 		}
 
@@ -428,10 +422,9 @@ func EmojiSelectionHandler(c *gin.Context) {
 		"IsWaitingState":  false,
 		"IsFirstPlayer":   wouldBeFirst,
 		"NeedsSSE":        true,
-		"PageType":        "emoji",
 	}
 
-	c.HTML(http.StatusOK, "base.html", data)
+	c.HTML(http.StatusOK, "emoji-selection.html", data)
 }
 
 func EmojiSelectionSubmitHandler(c *gin.Context) {

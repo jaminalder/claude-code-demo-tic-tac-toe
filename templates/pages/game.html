@@ -1,4 +1,6 @@
-{{define "game_content"}}
+{{define "game.html"}}{{template "base.html" .}}{{end}}
+
+{{define "content"}}
 <div class="hero">
     <h2>Game #{{.GameID}}</h2>
     
@@ -81,67 +83,3 @@
 </div>
 {{end}}
 
-{{define "game_styles"}}
-<style>
-    .players-display {
-        background-color: #f8f9fa;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 12px;
-        margin: 15px 0;
-        text-align: center;
-    }
-    
-    .players-display p {
-        margin: 0;
-        font-size: 18px;
-        color: #495057;
-    }
-    
-    .players-display strong {
-        color: #212529;
-    }
-    
-    .turn-indicator {
-        background-color: #e3f2fd;
-        border: 2px solid #2196f3;
-        border-radius: 8px;
-        padding: 12px;
-        margin: 15px 0;
-        text-align: center;
-        font-size: 18px;
-        color: #1565c0;
-        font-weight: bold;
-    }
-    
-    .game-result {
-        background-color: #f3e5f5;
-        border: 2px solid #9c27b0;
-        border-radius: 8px;
-        padding: 20px;
-        margin: 15px 0;
-        text-align: center;
-        font-size: 24px;
-        color: #7b1fa2;
-        font-weight: bold;
-    }
-    
-    .game-result.winner {
-        background-color: #e8f5e8;
-        border-color: #4caf50;
-        color: #2e7d32;
-    }
-    
-    .game-result.draw {
-        background-color: #fff3e0;
-        border-color: #ff9800;
-        color: #ef6c00;
-    }
-</style>
-{{end}}
-
-{{define "game_scripts"}}
-<script>
-    // Handle game events for UI updates (no page reload needed since UI updates will come via SSE)
-</script>
-{{end}}
