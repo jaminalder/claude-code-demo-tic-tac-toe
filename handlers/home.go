@@ -262,7 +262,6 @@ func addPlayerToGame(game *Game, playerID, emoji string) error {
 func HomeHandler(c *gin.Context) {
 	data := gin.H{
 		"Title": "Tic-Tac-Toe Game",
-		"NeedsSSE": false,
 	}
 
 	c.HTML(http.StatusOK, "home.html", data)
@@ -280,8 +279,7 @@ func GamePageHandler(c *gin.Context) {
 	if game == nil {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"Title": "Game Not Found",
-			"NeedsSSE": false,
-			})
+		})
 		return
 	}
 
@@ -338,7 +336,6 @@ func GamePageHandler(c *gin.Context) {
 		"WinnerEmoji":      winnerEmoji,
 		"IsGameActive":     isGameActive(game),
 		"IsGameFinished":   isGameFinished(game),
-		"NeedsSSE":         true,
 	}
 
 	c.HTML(http.StatusOK, "game.html", data)
@@ -351,8 +348,7 @@ func EmojiSelectionHandler(c *gin.Context) {
 	if game == nil {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"Title": "Game Not Found",
-			"NeedsSSE": false,
-			})
+		})
 		return
 	}
 
@@ -364,8 +360,7 @@ func EmojiSelectionHandler(c *gin.Context) {
 		if _, exists := game.Players[playerID]; !exists {
 			c.HTML(http.StatusOK, "game-full.html", gin.H{
 				"Title": "Game Full",
-				"NeedsSSE": false,
-					})
+			})
 			return
 		}
 	}
@@ -389,8 +384,7 @@ func EmojiSelectionHandler(c *gin.Context) {
 				"SelectedEmoji":  player.Emoji,
 				"IsWaitingState": true,
 				"IsFirstPlayer":  true,
-				"NeedsSSE":       true,
-					}
+			}
 			c.HTML(http.StatusOK, "emoji-selection.html", data)
 			return
 		}
@@ -421,7 +415,6 @@ func EmojiSelectionHandler(c *gin.Context) {
 		"AvailableEmojis": availableEmojiList,
 		"IsWaitingState":  false,
 		"IsFirstPlayer":   wouldBeFirst,
-		"NeedsSSE":        true,
 	}
 
 	c.HTML(http.StatusOK, "emoji-selection.html", data)
