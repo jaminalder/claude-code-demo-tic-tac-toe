@@ -11,8 +11,8 @@ import (
 // Global game storage
 var games = make(map[string]*models.Game)
 
-// GenerateGameID creates a unique game identifier
-func GenerateGameID() string {
+// generateGameID creates a unique game identifier
+func generateGameID() string {
 	bytes := make([]byte, 4)
 	rand.Read(bytes)
 	return fmt.Sprintf("%x", bytes)
@@ -27,7 +27,7 @@ func GeneratePlayerID() string {
 
 // CreateGame creates a new game and stores it
 func CreateGame() *models.Game {
-	id := GenerateGameID()
+	id := generateGameID()
 	game := &models.Game{
 		ID:          id,
 		Board:       models.GameBoard{},

@@ -17,11 +17,9 @@ type GameStatus string
 
 const (
 	GameStatusWaiting  GameStatus = "waiting"  // 1 player, waiting for opponent
-	GameStatusReady    GameStatus = "ready"    // 2 players, game can be played
 	GameStatusActive   GameStatus = "active"   // Game is being played
 	GameStatusFinished GameStatus = "finished" // Game finished with a winner
 	GameStatusDraw     GameStatus = "draw"     // Game finished in a draw
-	GameStatusFull     GameStatus = "full"     // 2 players, no more joins allowed
 )
 
 const MaxPlayersPerGame = 2

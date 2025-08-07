@@ -11,8 +11,8 @@ import (
 // Global subscriber management
 var gameSubscribers = make(map[string][]*models.GameSubscriber)
 
-// GenerateSubscriberID creates a unique subscriber identifier
-func GenerateSubscriberID() string {
+// generateSubscriberID creates a unique subscriber identifier
+func generateSubscriberID() string {
 	bytes := make([]byte, 8)
 	rand.Read(bytes)
 	return fmt.Sprintf("%x", bytes)
@@ -21,7 +21,7 @@ func GenerateSubscriberID() string {
 // CreateGameSubscriber creates and registers a new subscriber for a game
 func CreateGameSubscriber(gameID string, ctx context.Context) *models.GameSubscriber {
 	subscriber := &models.GameSubscriber{
-		ID:      GenerateSubscriberID(),
+		ID:      generateSubscriberID(),
 		GameID:  gameID,
 		Channel: make(chan models.GameEvent, 10), // Buffer for events
 		Context: ctx,
