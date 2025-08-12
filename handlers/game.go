@@ -378,7 +378,12 @@ func GameResetHandler(c *gin.Context) {
 		return
 	}
 
+	// Reset all game state
 	gameData.Board = models.GameBoard{}
+	gameData.Status = models.GameStatusActive
+	gameData.Winner = ""
+	gameData.MoveCount = 0
+	gameData.CurrentTurn = 0
 
 	// Broadcast reset event to all subscribers
 	events.BroadcastGameEvent(gameID, models.GameEvent{
@@ -388,6 +393,9 @@ func GameResetHandler(c *gin.Context) {
 			"board": gameData.Board,
 		},
 	})
+
+	// Send personalized game status updates to each player
+	events.BroadcastPersonalizedGameStatus(gameID, gameData)
 
 	renderGameBoard(c, gameID)
 }
